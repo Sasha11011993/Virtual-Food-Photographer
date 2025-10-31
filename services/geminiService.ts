@@ -57,6 +57,12 @@ const getPromptForStyle = (dish: Dish, style: ImageStyle): string => {
             return basePrompt + "Стиль світлий, чистий та сучасний, з білим мармуровим або світлим фоном, мінімалістичним реквізитом та яскравим, природним, м'яким освітленням. Відчуття свіжості та простоти. Знято з малою глибиною різкості.";
         case 'Для соцмереж':
             return basePrompt + "Яскрава фотографія 'флет-лей' зверху вниз, стилізована для соціальних мереж. Страва красиво розміщена на чистій, цікавій поверхні, такій як сланець або кольоровий килимок, з доповнюючими інгредієнтами або реквізитом, художньо розкиданим навколо. Яскраво, кольорово та дуже привабливо.";
+        case 'Вишукана Кухня':
+            return basePrompt + "Елегантна фотографія у стилі 'haute cuisine'. Страва вишукано подана на дизайнерській тарілці, на тлі розкішної текстури, такої як темний мармур або оксамит. Освітлення м'яке, сфокусоване, що підкреслює деталі та текстуру страви. Композиція бездоганна, мінімалістична та артистична. Відчуття ексклюзивності та високої кухні.";
+        case 'Домашній Затишок':
+            return basePrompt + "Тепла та затишна фотографія в стилі 'комфортної їжі'. Страва подається в керамічному посуді, можливо, на картатій скатертині або старовинній дерев'яній дошці. М'яке, тепле світло, що ллється з вікна. Навколо можуть бути затишні деталі, як-от свіжий хліб або склянка молока. Атмосфера домашнього затишку та щирості.";
+        case 'Яскравий Поп-арт':
+            return basePrompt + "Смілива та енергійна фотографія в стилі поп-арт. Страва розміщена на тлі яскравого, однотонного кольорового фону, що створює сильний контраст. Освітлення жорстке, створює чіткі тіні. Композиція графічна та динамічна, з використанням геометричних форм. Яскраво, сучасно та привертає увагу.";
     }
 };
 
@@ -80,7 +86,7 @@ export async function generateFoodImage(dish: Dish, style: ImageStyle): Promise<
     }
 }
 
-export async function editImageWithPrompt(base64ImageData: string, mimeType: string, prompt: string): Promise<string> {
+export async function editImage(base64ImageData: string, mimeType: string, prompt: string): Promise<string> {
     const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash-image',
         contents: {
@@ -108,4 +114,9 @@ export async function editImageWithPrompt(base64ImageData: string, mimeType: str
     }
 
     throw new Error("Failed to get edited image from response.");
+}
+
+export async function editImageBackground(base64ImageData: string, mimeType: string, prompt: string): Promise<string> {
+    const fullPrompt = `Зміни фон цього зображення на: "${prompt}". Збережи головну страву на передньому плані без змін, реалістичною та неушкодженою.`;
+    return editImage(base64ImageData, mimeType, fullPrompt);
 }

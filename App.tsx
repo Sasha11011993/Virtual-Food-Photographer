@@ -1,12 +1,13 @@
 import React, { useState, useCallback } from 'react';
 import { Dish, ImageStyle } from './types';
-import { parseMenu, generateFoodImage, editImageWithPrompt } from './services/geminiService';
+import { parseMenu, generateFoodImage, editImage, editImageBackground } from './services/geminiService';
 
 import Header from './components/Header';
 import MenuInput from './components/MenuInput';
 import StyleSelector from './components/StyleSelector';
 import ImageGallery from './components/ImageGallery';
 import ImageEditorModal from './components/ImageEditorModal';
+import BackgroundEditorModal from './components/BackgroundEditorModal';
 
 type GeneratedImages = Record<string, string | null>;
 type EditingState = {
@@ -24,6 +25,8 @@ export default function App() {
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [editingState, setEditingState] = useState<EditingState>(null);
+  const [backgroundEditingState, setBackgroundEditingState] = useState<EditingState>(null);
+
 
   const handleGenerate = useCallback(async (text: string) => {
     if (!text.trim()) {
@@ -95,9 +98,20 @@ export default function App() {
       setEditingState({ dish, imageUrl });
     }
   };
+  
+  const handleBackgroundEditRequest = (dish: Dish) => {
+    const imageUrl = images[dish.name];
+    if(imageUrl && imageUrl !== 'error') {
+      setBackgroundEditingState({ dish, imageUrl });
+    }
+  };
 
   const handleCloseEditor = () => {
     setEditingState(null);
+  };
+  
+  const handleCloseBackgroundEditor = () => {
+    setBackgroundEditingState(null);
   };
 
   const handleApplyEdit = async (prompt: string) => {
@@ -108,14 +122,31 @@ export default function App() {
       const base64Data = imageUrl.split(',')[1];
       const mimeType = imageUrl.substring(imageUrl.indexOf(':') + 1, imageUrl.indexOf(';'));
       
-      const editedImageBase64 = await editImageWithPrompt(base64Data, mimeType, prompt);
+      const editedImageBase64 = await editImage(base64Data, mimeType, prompt);
       
       setImages(prev => ({ ...prev, [dish.name]: `data:image/png;base64,${editedImageBase64}` }));
       handleCloseEditor();
     } catch (err) {
       console.error('Failed to edit image:', err);
-      // We can show an error inside the modal. For now, just logging it.
-      handleCloseEditor(); // Or keep it open with an error message.
+      handleCloseEditor();
+    }
+  };
+
+  const handleApplyBackgroundEdit = async (prompt: string) => {
+    if (!backgroundEditingState) return;
+
+    const { dish, imageUrl } = backgroundEditingState;
+    try {
+      const base64Data = imageUrl.split(',')[1];
+      const mimeType = imageUrl.substring(imageUrl.indexOf(':') + 1, imageUrl.indexOf(';'));
+      
+      const editedImageBase64 = await editImageBackground(base64Data, mimeType, prompt);
+      
+      setImages(prev => ({ ...prev, [dish.name]: `data:image/png;base64,${editedImageBase64}` }));
+      handleCloseBackgroundEditor();
+    } catch (err) {
+      console.error('Failed to edit image background:', err);
+      handleCloseBackgroundEditor();
     }
   };
 
@@ -144,6 +175,7 @@ export default function App() {
                 images={images} 
                 isLoading={isLoadingMenu} 
                 onEdit={handleEditRequest}
+                onBackgroundEdit={handleBackgroundEditRequest}
             />
           </div>
         </div>
@@ -155,6 +187,15 @@ export default function App() {
           onApplyEdit={handleApplyEdit}
           dish={editingState.dish}
           imageUrl={editingState.imageUrl}
+        />
+      )}
+       {backgroundEditingState && (
+        <BackgroundEditorModal
+          isOpen={!!backgroundEditingState}
+          onClose={handleCloseBackgroundEditor}
+          onApplyEdit={handleApplyBackgroundEdit}
+          dish={backgroundEditingState.dish}
+          imageUrl={backgroundEditingState.imageUrl}
         />
       )}
     </div>

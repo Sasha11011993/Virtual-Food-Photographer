@@ -8,9 +8,10 @@ interface ImageGalleryProps {
   images: Record<string, string | null>;
   isLoading: boolean;
   onEdit: (dish: Dish) => void;
+  onBackgroundEdit: (dish: Dish) => void;
 }
 
-const ImageGallery: React.FC<ImageGalleryProps> = ({ dishes, images, isLoading, onEdit }) => {
+const ImageGallery: React.FC<ImageGalleryProps> = ({ dishes, images, isLoading, onEdit, onBackgroundEdit }) => {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center text-center p-10 bg-brand-secondary rounded-2xl min-h-[300px]">
@@ -39,6 +40,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ dishes, images, isLoading, 
           dish={dish} 
           imageUrl={images[dish.name]} 
           onEdit={() => onEdit(dish)}
+          onBackgroundEdit={() => onBackgroundEdit(dish)}
         />
       ))}
     </div>

@@ -6,7 +6,15 @@ interface StyleSelectorProps {
   onStyleChange: (style: ImageStyle) => void;
 }
 
-const styles: ImageStyle[] = ['Світлий/Сучасний', 'Рустика/Темний', 'Для соцмереж'];
+const styles: ImageStyle[] = [
+  'Світлий/Сучасний', 
+  'Рустика/Темний', 
+  'Вишукана Кухня',
+  'Домашній Затишок', 
+  'Яскравий Поп-арт',
+  'Для соцмереж'
+];
+
 
 const StyleSelector: React.FC<StyleSelectorProps> = ({ selectedStyle, onStyleChange }) => {
   return (
