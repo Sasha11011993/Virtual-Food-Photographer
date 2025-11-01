@@ -22,7 +22,7 @@ export default function App() {
   const [images, setImages] = useState<GeneratedImages>({});
   const [style, setStyle] = useState<ImageStyle>('Світлий/Сучасний');
   const [isLoadingMenu, setIsLoadingMenu] = useState<boolean>(false);
-  const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  // FIX: The 'isGenerating' state was unused and has been removed.
   const [error, setError] = useState<string | null>(null);
   const [editingState, setEditingState] = useState<EditingState>(null);
   const [backgroundEditingState, setBackgroundEditingState] = useState<EditingState>(null);
@@ -43,7 +43,6 @@ export default function App() {
       const parsedDishes = await parseMenu(text);
       setDishes(parsedDishes);
       setIsLoadingMenu(false);
-      setIsGenerating(true);
       
       const initialImages: GeneratedImages = parsedDishes.reduce((acc, dish) => ({ ...acc, [dish.name]: null }), {});
       setImages(initialImages);
@@ -51,7 +50,7 @@ export default function App() {
       for (const dish of parsedDishes) {
         generateFoodImage(dish, style)
           .then(base64Image => {
-            setImages(prev => ({ ...prev, [dish.name]: `data:image/jpeg;base64,${base64Image}` }));
+            setImages(prev => ({ ...prev, [dish.name]: `data:image/png;base64,${base64Image}` }));
           })
           .catch(err => {
             console.error(`Failed to generate image for ${dish.name}`, err);
@@ -63,10 +62,6 @@ export default function App() {
       console.error(err);
       setError('Не вдалося розпарсити меню. Будь ласка, перевірте формат і спробуйте ще раз.');
       setIsLoadingMenu(false);
-    } finally {
-        // This is tricky. We set isGenerating to true and let the loop finish.
-        // A more robust solution might use Promise.all and then set isGenerating to false.
-        // For this UX, we let it be true while images pop in.
     }
   }, [style]);
 
@@ -74,14 +69,13 @@ export default function App() {
     setStyle(newStyle);
     if (dishes.length > 0) {
       setImages({});
-      setIsGenerating(true);
       const initialImages: GeneratedImages = dishes.reduce((acc, dish) => ({ ...acc, [dish.name]: null }), {});
       setImages(initialImages);
 
       for (const dish of dishes) {
          generateFoodImage(dish, newStyle)
           .then(base64Image => {
-            setImages(prev => ({ ...prev, [dish.name]: `data:image/jpeg;base64,${base64Image}` }));
+            setImages(prev => ({ ...prev, [dish.name]: `data:image/png;base64,${base64Image}` }));
           })
           .catch(err => {
             console.error(`Failed to generate image for ${dish.name}`, err);
@@ -162,13 +156,15 @@ export default function App() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           <div className="lg:col-span-1 lg:sticky lg:top-8 bg-brand-secondary p-6 rounded-2xl shadow-lg">
              <MenuInput onGenerate={handleGenerate} isLoading={isLoadingMenu} />
           </div>
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-1">
             {dishes.length > 0 && (
+              <>
                 <StyleSelector selectedStyle={style} onStyleChange={handleStyleChange} />
+              </>
             )}
             <ImageGallery 
                 dishes={dishes} 

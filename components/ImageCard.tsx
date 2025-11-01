@@ -21,7 +21,7 @@ const ImageCard: React.FC<ImageCardProps> = ({ dish, imageUrl, onEdit, onBackgro
     
     // Create a safe filename from the dish name
     const safeFileName = dish.name.replace(/[^a-z0-9а-яіїєґ_-\s]/gi, '').trim() || 'image';
-    link.download = `${safeFileName}.jpeg`;
+    link.download = `${safeFileName}.png`;
     
     document.body.appendChild(link);
     link.click();

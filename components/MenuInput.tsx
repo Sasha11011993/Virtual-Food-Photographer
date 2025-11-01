@@ -17,7 +17,7 @@ const MenuInput: React.FC<MenuInputProps> = ({ onGenerate, isLoading }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <h2 className="text-xl font-serif font-bold text-brand-accent">1. Вставте Ваше Меню</h2>
+      <h2 className="text-xl font-serif font-bold text-brand-accent">Вставте Ваше Меню</h2>
       <p className="text-brand-subtle text-sm -mt-4">
         Введіть ваше меню нижче. Наш ШІ визначить страви та їх описи.
       </p>

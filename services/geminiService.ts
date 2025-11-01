@@ -69,21 +69,27 @@ const getPromptForStyle = (dish: Dish, style: ImageStyle): string => {
 export async function generateFoodImage(dish: Dish, style: ImageStyle): Promise<string> {
     const prompt = getPromptForStyle(dish, style);
     
-    const response = await ai.models.generateImages({
-        model: 'imagen-4.0-generate-001',
-        prompt: prompt,
+    const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash-image',
+        contents: {
+            parts: [
+                {
+                    text: prompt,
+                },
+            ],
+        },
         config: {
-            numberOfImages: 1,
-            outputMimeType: 'image/jpeg',
-            aspectRatio: style === 'Для соцмереж' ? '1:1' : '4:3',
+            responseModalities: [Modality.IMAGE],
         },
     });
 
-    if (response.generatedImages && response.generatedImages.length > 0) {
-        return response.generatedImages[0].image.imageBytes;
-    } else {
-        throw new Error("Image generation failed, no images returned.");
+    for (const part of response.candidates[0].content.parts) {
+        if (part.inlineData) {
+            return part.inlineData.data;
+        }
     }
+
+    throw new Error("Image generation failed, no images returned.");
 }
 
 export async function editImage(base64ImageData: string, mimeType: string, prompt: string): Promise<string> {

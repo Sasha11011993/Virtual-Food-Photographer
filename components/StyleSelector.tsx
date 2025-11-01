@@ -19,7 +19,7 @@ const styles: ImageStyle[] = [
 const StyleSelector: React.FC<StyleSelectorProps> = ({ selectedStyle, onStyleChange }) => {
   return (
     <div className="mb-8">
-      <h2 className="text-xl font-serif font-bold text-brand-accent mb-4">2. Оберіть Стиль</h2>
+      <h2 className="text-xl font-serif font-bold text-brand-accent mb-4">Оберіть Стиль</h2>
       <div className="flex flex-wrap gap-3 p-2 bg-brand-secondary rounded-xl">
         {styles.map((style) => (
           <button
